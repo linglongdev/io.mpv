@@ -1,42 +1,138 @@
+version: '1'
+
 package:
-  id: mpv
-  version: 0.29.1.37
-  kind: lib
+  id: io.mpv
+  name: mpv player
+  version: 0.41.0.0
+  kind: app
+  description: |
+    Command line media player
 
-base:
-  id: org.deepin.base
-  version: 23.0.0
+command: [mpv]
 
-source:
-  kind: git
-  url: https://github.com/deepin-community/mpv.git
-  version: 0.29.1.37
-  commit: 1183259bebef845ee05d8231e0886b6e52eb2715
-  patch:
-  - 0001-waf.patch
-  - 0002-Add-keywords-to-desktop-file.patch
-  - 0003-io-stdin-used.patch
-build:
-  kind: manual
-  manual:
-    configure: |
-      #if linux, enable-dvbin
-      export CC=gcc
-      export ARCH_CONFIGURE="--enable-dvbin"
-      python3 ./waf configure \
-                        --prefix=${PREFIX} \
-                        --libdir=${PREFIX}/lib \
-                        --confdir=${PREFIX}/etc/mpv \
-                        --zshdir=${PREFIX}/share/zsh/vendor-completions	\
-                        --enable-cdda \
-                        --enable-dvdnav	\
-                        --enable-dvdread \
-                        --enable-libmpv-shared \
-                        --enable-libsmbclient \
-                        --enable-sdl2 \
-                        --enable-sndio \
-                        --enable-zsh-comp \
-                        --disable-build-date \
-                        --enable-dvbin
-      python3 ./waf -v build
-      python3 ./waf -v install
+base: org.deepin.base/25.2.2
+
+sources:
+  - kind: git
+    url: https://github.com/mpv-player/mpv.git
+    commit: v0.41.0
+
+build: |
+  cd /project/linglong/sources/mpv.git
+  mkdir -p $PREFIX/etc
+  readonly APP_LIB="$PREFIX/lib/$TRIPLET/"
+  echo -e "$APP_LIB/samba\n$APP_LIB/blas\n$APP_LIB/lapack" > $PREFIX/etc/ld.so.conf
+  meson setup build --prefix="$PREFIX"
+  meson compile -C build
+  meson install -C build
+
+buildext:
+  apt:
+    build_depends:
+      - build-essential
+      - libarchive-dev
+      - libasound2-dev
+      - libass-dev
+      - libavcodec-dev
+      - libavdevice-dev
+      - libavfilter-dev
+      - libavformat-dev
+      - libavutil-dev
+      - libbluray-dev
+      - libcdio-dev
+      - libcdio-paranoia-dev
+      - libdisplay-info-dev
+      - libdrm-dev
+      - libdvdnav-dev
+      - libegl-dev
+      - libffmpeg-nvenc-dev
+      - libgbm-dev
+      - libgl-dev
+      - libjack-dev
+      - libjpeg-dev
+      - liblcms2-dev
+      - liblua5.2-dev
+      - libmujs-dev
+      - libpipewire-0.3-dev
+      - libplacebo-dev
+      - libpulse-dev
+      - librubberband-dev
+      - libsixel-dev
+      - libsndio-dev
+      - libswscale-dev
+      - libuchardet-dev
+      - libva-dev
+      - libvdpau-dev
+      - libvulkan-dev
+      - libwayland-dev
+      - libx11-dev
+      - libxinerama-dev
+      - libxkbcommon-dev
+      - libxpresent-dev
+      - libxrandr-dev
+      - libxss-dev
+      - libxv-dev
+      - libzimg-dev
+      - meson
+      - ninja-build
+      - pkgconf
+      - python3-docutils
+      - wayland-protocols
+    depends:
+      - libva-wayland2 # not exists in base, add it to app
+      - libsmbclient
+      - samba-libs
+      - libmujs3
+      - libdisplay-info1
+      - libblas3
+      - liblapack3
+      - libarchive13
+      - libasound2
+      - libass9
+      - libavcodec-extra60
+      - libavdevice60
+      - libavfilter-extra9
+      - libavformat-extra60
+      - libavutil58
+      - libbluray2
+      - libc6
+      - libcaca0
+      - libcdio-cdda2
+      - libcdio-paranoia2
+      - libcdio19
+      - libdrm2
+      - libdvdnav4
+      - libegl1
+      - libgbm1
+      - libjack0
+      - libjpeg62-turbo
+      - liblcms2-2
+      - liblua5.2-0
+      - libmujs1
+      - libpipewire-0.3-0
+      - libplacebo338
+      - libpulse0
+      - librubberband2
+      - libsdl2-2.0-0
+      - libsixel1
+      - libswresample4
+      - libswscale7
+      - libuchardet0
+      - libva-drm2
+      - libva-wayland2
+      - libva-x11-2
+      - libva2
+      - libvdpau1
+      - libvulkan1
+      - libwayland-client0
+      - libwayland-cursor0
+      - libwayland-egl1
+      - libx11-6
+      - libxext6
+      - libxkbcommon0
+      - libxpresent1
+      - libxrandr2
+      - libxss1
+      - libxv1
+      - libzimg2
+      - zlib1g
